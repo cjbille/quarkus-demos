@@ -2,7 +2,7 @@ package com.cjbdevlabs;
 
 import io.quarkiverse.amazon.s3.runtime.S3Crt;
 import io.quarkus.logging.Log;
-import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
@@ -13,49 +13,47 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
-import software.amazon.awssdk.services.s3.S3AsyncClient;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.transfer.s3.S3TransferManager;
+import software.amazon.awssdk.transfer.s3.model.Upload;
+import software.amazon.awssdk.transfer.s3.model.UploadRequest;
 
 import java.io.InputStream;
 import java.util.UUID;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @Path("/upload")
 public class UploadResource {
 
     private static final String APPLICATION_TAR = "application/x-tar";
 
-    @Inject
-    @S3Crt
-    S3AsyncClient s3Client;
+    private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
     @Inject
-    UploadExecutor uploadExecutor;
+    @S3Crt
+    S3TransferManager s3TransferManager;
 
     @ConfigProperty(name = "com.cjbdevlabs.s3.bucket")
     String s3bucket;
 
-    @PostConstruct
-    public void logAwsRetryConfig() {
-        Log.infof("aws.maxAttempts property = %s", System.getProperty("aws.maxAttempts"));
-    }
-
     @Path("s3")
     @POST
     @Consumes(MediaType.WILDCARD)
-    public Response uploadFile(InputStream body, @Context HttpHeaders httpHeaders) {
+    public Response uploadFile(InputStream inputStream, @Context HttpHeaders httpHeaders) {
         var fileName = httpHeaders.getHeaderString("filename") != null
                 ? httpHeaders.getHeaderString("filename") + ".tar"
                 : UUID.randomUUID() + ".tar";
-        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .bucket(s3bucket)
-                .key(fileName)
-                .contentType(APPLICATION_TAR)
-                .build();
         try {
             Log.infof("Received filename: %s", fileName);
-            AsyncRequestBody asyncBody = AsyncRequestBody.fromInputStream(body, null, uploadExecutor.get());
-            s3Client.putObject(putObjectRequest, asyncBody).join();
+            AsyncRequestBody body = AsyncRequestBody.fromInputStream(inputStream, null, executor);
+            UploadRequest uploadRequest = UploadRequest.builder()
+                    .putObjectRequest(req -> req.bucket(s3bucket).key(fileName).contentType(APPLICATION_TAR))
+                    .requestBody(body)
+                    .build();
+            Upload upload = s3TransferManager.upload(uploadRequest);
+            upload.completionFuture().join();
             return Response.accepted().build();
         } catch (CompletionException e) {
             Log.errorf("FAIL | fileName=%s | cause=%s", fileName, e.getCause());
@@ -63,6 +61,19 @@ public class UploadResource {
         } catch (Exception e) {
             Log.errorf("FAIL | fileName=%s | exception=%s | message=%s", fileName, e.getClass().getSimpleName(), e.getMessage());
             return Response.serverError().build();
+        }
+    }
+
+    @PreDestroy
+    void shutdown() {
+        executor.shutdown();
+        try {
+            if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
         }
     }
 }
