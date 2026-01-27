@@ -1,11 +1,8 @@
 # quarkus-s3-demo
-
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
-
 If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
 
 ## Running the application in dev mode
-
 You can run your application in dev mode that enables live coding using:
 
 ```shell script
@@ -15,7 +12,6 @@ mvn quarkus:dev
 > **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:9090/q/dev/>.
 
 ## Packaging and running the application
-
 The application can be packaged using:
 
 ```shell script
@@ -28,7 +24,6 @@ Be aware that it’s not an _über-jar_ as the dependencies are copied into the 
 The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
 
 ## Related Guides
-
 - SmallRye OpenAPI ([guide](https://quarkus.io/guides/openapi-swaggerui)): Document your REST APIs with OpenAPI - comes
   with Swagger UI
 - REST Jackson ([guide](https://quarkus.io/guides/rest#json-serialisation)): Jackson serialization support for Quarkus
@@ -38,7 +33,6 @@ The application is now runnable using `java -jar target/quarkus-app/quarkus-run.
   cloud storage
 
 ## Test with Curl
-
 ```shell script
 curl -X POST \
      -H "filename: archive" \
@@ -46,16 +40,18 @@ curl -X POST \
      http://localhost:9090/upload/s3
 ```
 
+## Build Docker Image
+- `docker build -f src/main/docker/Dockerfile -t quarkus/quarkus-s3-demo .`
+- `docker run -i --rm -p 9090:9090 quarkus/quarkus-s3-demo`
+
 ## Provided Code
 
 ### REST
-
 Easily start your REST Web Services
 
 [Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
 
 ### SmallRye Health
-
 Monitor your application's health using SmallRye Health
 
 [Related guide section...](https://quarkus.io/guides/smallrye-health)
