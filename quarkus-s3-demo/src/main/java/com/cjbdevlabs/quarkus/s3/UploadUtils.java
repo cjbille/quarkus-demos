@@ -1,4 +1,4 @@
-package com.cjbdevlabs;
+package com.cjbdevlabs.quarkus.s3;
 
 import java.util.UUID;
 

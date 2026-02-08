@@ -1,4 +1,4 @@
-package com.cjbdevlabs;
+package com.cjbdevlabs.quarkus.s3;
 
 import io.quarkiverse.amazon.s3.runtime.S3Crt;
 import io.quarkus.test.InjectMock;
