@@ -12,6 +12,7 @@ import java.util.List;
 @Path("/coffee")
 public class CoffeeResource {
 
+    @Path("/roasts")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -19,7 +20,7 @@ public class CoffeeResource {
     public List<String> getAll() {
         var lightRoast = "Light Roast";
         var mediumRoast = "Medium Roast";
-        var boldRoast = "Bold Roast";
-        return List.of(lightRoast, mediumRoast, boldRoast);
+        var darkRoast = "Dark Roast";
+        return List.of(lightRoast, mediumRoast, darkRoast);
     }
 }

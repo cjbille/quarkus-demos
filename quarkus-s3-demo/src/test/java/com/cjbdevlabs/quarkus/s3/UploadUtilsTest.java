@@ -17,18 +17,18 @@ class UploadUtilsTest {
     void buildFileNameShouldReturnHeaderPlusExtensionWhenHeaderIsValid() {
         var fileNameHeader = "my-report-2026";
         var actual = UploadUtils.buildFileName(fileNameHeader);
-        var expected  = "my-report-2026.tar";
+        var expected  = "my-report-2026.tar.gz";
         assertEquals(expected, actual);
     }
 
-    @ParameterizedTest(name = "Should generate UUID for blank input: \"{0}\"")
+    @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {" ", "\t", "\n"})
     void buildFileNameShouldGenerateUuidWhenHeaderIsBlank(String blankHeader) {
         var result = UploadUtils.buildFileName(blankHeader);
         assertNotNull(result);
-        assertTrue(result.endsWith(".tar"), "File name must end with .tar extension");
-        var uuidPart = result.replace(".tar", "");
+        assertTrue(result.endsWith(".tar.gz"), "File name must end with .tar.gz extension");
+        var uuidPart = result.replace(".tar.gz", "");
         assertTrue(uuidPart.matches(UUID_REGEX), () -> "Expected a valid UUID but got: " + uuidPart);
     }
 }
