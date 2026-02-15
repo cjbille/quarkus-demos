@@ -4,20 +4,16 @@ If you want to learn more about Quarkus, please visit its website: <https://quar
 
 ## Running the application in dev mode
 You can run your application in dev mode that enables live coding using:
-
 ```shell script
 mvn quarkus:dev
 ```
-
 > **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:9090/q/dev/>.
 
 ## Packaging and running the application
 The application can be packaged using:
-
 ```shell script
 mvn package
 ```
-
 It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
 Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
 
@@ -42,15 +38,3 @@ curl -X POST \
 ## Build Docker Image
 - `docker build -f src/main/docker/Dockerfile -t quarkus/quarkus-s3-demo .`
 - `docker run -i --rm -p 9090:9090 quarkus/quarkus-s3-demo`
-
-## Provided Code
-
-### REST
-Easily start your REST Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
-
-### SmallRye Health
-Monitor your application's health using SmallRye Health
-
-[Related guide section...](https://quarkus.io/guides/smallrye-health)
