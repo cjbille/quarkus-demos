@@ -6,7 +6,7 @@ public class UploadUtils {
 
     public static String buildFileName(String fileNameHeader) {
         var fileName = isNotBlank(fileNameHeader) ? fileNameHeader : UUID.randomUUID().toString();
-        return fileName + ".tar.gz";
+        return fileName + ".tar";
     }
 
     public static boolean isNotBlank(String s) {
