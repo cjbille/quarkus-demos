@@ -1,0 +1,24 @@
+package com.cjbdevlabs.quarkus.athena;
+
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+import java.util.List;
+
+@Path("/coffee")
+public class CoffeeResource {
+
+    @Path("/roasts")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public List<String> getAll() {
+        var lightRoast = "Light Roast";
+        var mediumRoast = "Medium Roast";
+        var darkRoast = "Dark Roast";
+        return List.of(lightRoast, mediumRoast, darkRoast);
+    }
+}
