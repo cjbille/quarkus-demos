@@ -20,6 +20,7 @@
     </properties>
 
     <modules>
+        <module>quarkus-athena-demo</module>
         <module>quarkus-dynamodb-demo</module>
         <module>quarkus-s3-demo</module>
     </modules>
