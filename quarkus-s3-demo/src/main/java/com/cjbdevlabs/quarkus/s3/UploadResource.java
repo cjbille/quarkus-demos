@@ -2,6 +2,7 @@ package com.cjbdevlabs.quarkus.s3;
 
 import io.quarkiverse.amazon.s3.runtime.S3Crt;
 import io.quarkus.logging.Log;
+import io.quarkus.virtual.threads.VirtualThreads;
 import io.smallrye.common.annotation.RunOnVirtualThread;
 import jakarta.annotation.PreDestroy;
 import jakarta.inject.Inject;
@@ -26,16 +27,15 @@ import java.util.concurrent.TimeUnit;
 @Path("/upload")
 public class UploadResource {
 
-    private static final String APPLICATION_TAR = "application/x-tar";
-
-    private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-
-    @Inject
-    @S3Crt
-    S3TransferManager s3TransferManager;
-
     @ConfigProperty(name = "com.cjbdevlabs.s3.bucket")
     String s3bucket;
+
+    @Inject
+    S3TransferManager s3TransferManager;
+
+    @Inject
+    @VirtualThreads
+    ExecutorService executorService;
 
     @Path("s3")
     @POST
@@ -46,9 +46,9 @@ public class UploadResource {
         var fileName = UploadUtils.buildFileName(fileNameHeader);
         try {
             Log.infof("Received filename: %s", fileName);
-            AsyncRequestBody body = AsyncRequestBody.fromInputStream(inputStream, null, executor);
+            AsyncRequestBody body = AsyncRequestBody.fromInputStream(inputStream, null, executorService);
             UploadRequest uploadRequest = UploadRequest.builder()
-                    .putObjectRequest(req -> req.bucket(s3bucket).key(fileName).contentType(APPLICATION_TAR))
+                    .putObjectRequest(req -> req.bucket(s3bucket).key(fileName).contentType("application/x-tar"))
                     .requestBody(body)
                     .build();
             Log.infof("Upload Request: %s", uploadRequest.toString());
@@ -58,19 +58,6 @@ public class UploadResource {
             var err = e instanceof CompletionException ? e.getCause() : e;
             Log.errorf("FAIL | fileName=%s | exception=%s | message=%s", fileName, err.getClass().getSimpleName(), err.getMessage());
             return Response.serverError().build();
-        }
-    }
-
-    @PreDestroy
-    void shutdown() {
-        executor.shutdown();
-        try {
-            if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
-                executor.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            executor.shutdownNow();
-            Thread.currentThread().interrupt();
         }
     }
 }
