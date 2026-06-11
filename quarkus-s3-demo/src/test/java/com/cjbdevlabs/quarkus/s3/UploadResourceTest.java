@@ -28,7 +28,6 @@ import static org.mockito.Mockito.when;
 class UploadResourceTest {
 
     @InjectMock
-    @S3Crt
     S3TransferManager s3TransferManager;
 
     @BeforeEach
