@@ -1,10 +1,8 @@
 package com.cjbdevlabs.quarkus.s3;
 
-import io.quarkiverse.amazon.s3.runtime.S3Crt;
 import io.quarkus.logging.Log;
 import io.quarkus.virtual.threads.VirtualThreads;
 import io.smallrye.common.annotation.RunOnVirtualThread;
-import jakarta.annotation.PreDestroy;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
@@ -21,8 +19,6 @@ import software.amazon.awssdk.transfer.s3.model.UploadRequest;
 import java.io.InputStream;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 @Path("/upload")
 public class UploadResource {

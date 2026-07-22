@@ -5,7 +5,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 import java.util.Map;
 
-
 @ApplicationScoped
 public class AthenaService {
 
