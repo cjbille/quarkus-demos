@@ -1,6 +1,5 @@
 package com.cjbdevlabs.quarkus.s3;
 
-import io.quarkiverse.amazon.s3.runtime.S3Crt;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.ws.rs.core.MediaType;
